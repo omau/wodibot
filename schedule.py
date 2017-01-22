@@ -43,3 +43,9 @@ class ScheduleEntry:
             self.end_time
             )
         return class_descr
+
+    def __eq__(self, other):
+        return self.get_basic_description() == other.get_basic_description()
+
+    def __ne__(self, other):
+        return not self == other
