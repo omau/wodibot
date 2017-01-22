@@ -96,7 +96,6 @@ class Calendar():
         return by_days
 
     def parse_table(self):
-
         cal_table = self.browser.find_elements_by_xpath(TABLE_RECORDS_XPATH)
         for one_day in self.get_by_days(cal_table):
             print(SEP_DASHES + " DAY SEPARATOR " + SEP_DASHES)

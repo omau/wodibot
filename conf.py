@@ -1,9 +1,7 @@
 import configparser
 
-LOGGER_NAME = "WODILOG"
-
 USE_VIRTUAL_DISPLAY = False
-SEND_XMPP = False
+SEND_XMPP = True
 
 TARGET_JID = None
 BOT_JID = None

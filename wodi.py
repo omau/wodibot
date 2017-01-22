@@ -16,11 +16,11 @@ from selenium.webdriver.common.keys import Keys
 
 import xmpp
 
+from logger import prepare_logger
 from display import get_virtual_display, stop_virtual_display
 from wodicalendar import Calendar
 from conf import USE_VIRTUAL_DISPLAY
 from conf import SEND_XMPP
-from conf import LOGGER_NAME
 import conf
 
 THEME_PREFIX = "AthleteTheme_wtLayoutNormal_block_"
@@ -46,25 +46,28 @@ def wod_finished_loading(browser):
 
 
 def login(browser, wait):
+    log = logging.getLogger(__name__)
     """ Assumes browser is open and login page loaded.
     Enters credential and submits them."""
+    log.info("Loading main page")
     from conf import USERNAME, PASSWORD
     browser.get('https://app.wodify.com/WodifyAdminTheme/LoginEntry.aspx')
+    log.info("Entering credentials")
     uname = browser.find_element_by_id(USERNAME_ID)
     uname.send_keys(USERNAME)
     pword = browser.find_element_by_id(PASSWORD_ID)
     pword.send_keys(PASSWORD)
     sleep(1)
-    print("submit")
+    log.info("Submitting")
     pword.send_keys(Keys.RETURN)
-    print("beginning to wait...")
     wait.until(wod_finished_loading)
-    print("wait ended")
 
 # -------------------------- WOD
 
 
 def parse_wod(browser):
+    log = logging.getLogger(__name__)
+    log.info("Parsing WoD...")
     """ Assumes wod page is open.
     Parses wod, converts it to a text-based representation and returns it."""
     wodheader = browser.find_elements_by_id(WOD_HEADER_ELEMENT_ID)[0]
@@ -86,25 +89,29 @@ def parse_wod(browser):
 
     wod_date = date
 
+    log.info("Finished Parsing WoD.")
+    log.info("Result of parsing: "+wod)
     return wod, wod_date
 
 
 ##################
 def main():
     """ Regular entry point """
-    log = logging.Logger(LOGGER_NAME)
 
+    prepare_logger()
+    log = logging.getLogger(__name__)
     conf.read_config("config.txt")
 
     if USE_VIRTUAL_DISPLAY:
-        log.info("Enabling virtual display")
-        display = get_virtual_display()
+        try:
+            log.info("Enabling virtual display")
+            display = get_virtual_display()
+        except RuntimeError:
+            stop_virtual_display(display)
 
-    log.info("Starting browser")
     browser = get_browser()
     wait = ui.WebDriverWait(browser, 10)
 
-    log.info("Logging in")
     login(browser, wait)
 
     #####################
