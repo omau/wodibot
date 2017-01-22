@@ -1,5 +1,9 @@
+""" This module defines a class which represents calendar entries."""
+
 
 class ScheduleEntry:
+    """ This class represents a single calendar entry."""
+
     def __init__(self, name, classload, can_make_appointment, can_cancel,
                  program, date, start_time, end_time, coach):
         self.name = name
@@ -14,11 +18,11 @@ class ScheduleEntry:
 
     def __str__(self):
         class_descr = "{} class on {} from {} to {}. ".format(
-                self.program,
-                self.date,
-                self.start_time,
-                self.end_time
-                )
+            self.program,
+            self.date,
+            self.start_time,
+            self.end_time
+            )
         bookable = "bookable: {}, ".format(self.can_make_appointment)
         cancellable = "cancellable: {}, ".format(self.can_cancel)
         classload = "classload: {}, ".format(self.classload)
