@@ -54,13 +54,17 @@ class ScheduleEntry:
 
     def update(self, other):
         assert self == other
+        if (self.__str__() != other.__str__()):
+            print("Found update for class "+self.get_basic_description())
         if self.appointment_state != other.appointment_state:
-            print("State changed to " +
+            print("Appointment state + " +
+                  AppointmentState(self.appointment_state).name +
+                  " -> " +
                   AppointmentState(other.appointment_state).name)
             self.appointment_state = other.appointment_state
         if self.classload != other.classload:
-            print("Classload changed to ", other.classload)
+            print("Classload " + self.classload + " -> " + other.classload)
             self.classload = other.classload
         if self.coach != other.coach:
-            print("Coach changed to "+other.coach)
+            print("Coach: " + self.coach + " -> " + other.coach)
             self.coach = other.coach

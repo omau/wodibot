@@ -101,10 +101,12 @@ def handle_disappeared(entry, past_schedule):
 
 
 def handle_existing(entry, current_classes):
-    print("Handling existing entry " + entry.get_basic_description())
-    for current_entry in current_classes:
+    found = False
+    for current_entry in current_classes[entry.date]:
         if current_entry == entry:
+            found = True
             entry.update(current_entry)
+    assert(found)
 
 
 def handle_new(entry, past_schedule):
