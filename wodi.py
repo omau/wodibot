@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from selenium import webdriver
-from selenium.webdriver.support import ui
-from selenium.webdriver.common.keys import Keys
-from time import sleep
 import logging
 import os
 import re
 import datetime
+
+from time import sleep
+
+from selenium import webdriver
+from selenium.webdriver.support import ui
+from selenium.webdriver.common.keys import Keys
 
 # local imports
 
@@ -44,6 +46,8 @@ def wod_finished_loading(browser):
 
 
 def login(browser, wait):
+    """ Assumes browser is open and login page loaded.
+    Enters credential and submits them."""
     from conf import USERNAME, PASSWORD
     browser.get('https://app.wodify.com/WodifyAdminTheme/LoginEntry.aspx')
     uname = browser.find_element_by_id(USERNAME_ID)
@@ -61,24 +65,25 @@ def login(browser, wait):
 
 
 def parse_wod(browser):
+    """ Assumes wod page is open.
+    Parses wod, converts it to a text-based representation and returns it."""
     wodheader = browser.find_elements_by_id(WOD_HEADER_ELEMENT_ID)[0]
     date = wodheader.text
-    wod = browser.find_elements_by_id(WOD_BODY_ELEMENT_ID)[0]
-    html = wod.get_attribute('innerHTML')
+    wod_elem = browser.find_elements_by_id(WOD_BODY_ELEMENT_ID)[0]
+    html = wod_elem.get_attribute('innerHTML')
 
-    a = html.replace("<div class=\"section_title\">", "<br>")
-    b = a.replace("<div class=\"component_show_wrapper\">", "<br>")
-    c = b.replace("<div class=\"component_comment\">", "")
-    d = re.sub("[\<]\/?div.*?[\>]", "<br>", c)
-    e = d.replace("<br><br>", "<br>")
-    f = e.replace("<br><br><br>", "<br>")
-    g = re.sub("[\<]br?[\>]", "\n", f)
-    h = re.sub("[\<].*?[\>]", "\n", g)
-    i = h.replace("&nbsp;", "")
-    j = re.sub("[\<].*?[\>]", "", i)
+    wod = html.replace("<div class=\"section_title\">", "<br>")
+    wod = wod.replace("<div class=\"component_show_wrapper\">", "<br>")
+    wod = wod.replace("<div class=\"component_comment\">", "")
+    wod = re.sub("[<]\/?div.*?[>]", "<br>", wod)
+    wod = wod.replace("<br><br>", "<br>")
+    wod = wod.replace("<br><br><br>", "<br>")
+    wod = re.sub("[\<]br?[\>]", "\n", wod)
+    wod = re.sub("[\<].*?[\>]", "\n", wod)
+    wod = wod.replace("&nbsp;", "")
+    wod = re.sub("[\<].*?[\>]", "", wod)
     date = " ".join(date.split()[0:4])
 
-    wod = j
     wod_date = date
 
     return wod, wod_date
@@ -86,7 +91,7 @@ def parse_wod(browser):
 
 ##################
 def main():
-
+    """ Regular entry point """
     log = logging.Logger(LOGGER_NAME)
 
     conf.read_config("config.txt")
@@ -111,7 +116,7 @@ def main():
     #####################
     # send today's wod via xmpp
     #####################
-    if (SEND_XMPP):
+    if SEND_XMPP:
         xmpp_message = wod_date + "\n" + wod
         xmpp.send(xmpp_message)
 
