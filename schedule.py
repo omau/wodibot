@@ -45,7 +45,22 @@ class ScheduleEntry:
         return class_descr
 
     def __eq__(self, other):
+        if type(self) != type(other):
+            return False
         return self.get_basic_description() == other.get_basic_description()
 
     def __ne__(self, other):
         return not self == other
+
+    def update(self, other):
+        assert self == other
+        if self.appointment_state != other.appointment_state:
+            print("State changed to " +
+                  AppointmentState(other.appointment_state).name)
+            self.appointment_state = other.appointment_state
+        if self.classload != other.classload:
+            print("Classload changed to ", other.classload)
+            self.classload = other.classload
+        if self.coach != other.coach:
+            print("Coach changed to "+other.coach)
+            self.coach = other.coach
