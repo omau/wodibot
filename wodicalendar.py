@@ -57,7 +57,7 @@ class Calendar():
         elif "You have a" in reserv_col:
             state = AppointmentState.RESERVED
         else:
-            state = AppointmentState.OTHER
+            state = AppointmentState.FULL
 
         program = tds[4].text
         start_time = tds[6].text

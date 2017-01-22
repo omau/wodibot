@@ -7,7 +7,7 @@ class AppointmentState(Enum):
     RESERVABLE = 1
     RESERVED = 2
     NOT_RESERVABLE = 3
-    OTHER = 4
+    FULL = 4
 
 
 class ScheduleEntry:
@@ -55,15 +55,15 @@ class ScheduleEntry:
     def update(self, other):
         assert self == other
         if (self.__str__() != other.__str__()):
-            print("Found update for class "+self.get_basic_description())
+            print("Found update for "+self.get_basic_description())
         if self.appointment_state != other.appointment_state:
-            print("Appointment state + " +
+            print("Appointment state: " +
                   AppointmentState(self.appointment_state).name +
                   " -> " +
                   AppointmentState(other.appointment_state).name)
             self.appointment_state = other.appointment_state
         if self.classload != other.classload:
-            print("Classload " + self.classload + " -> " + other.classload)
+            print("Classload: " + self.classload + " -> " + other.classload)
             self.classload = other.classload
         if self.coach != other.coach:
             print("Coach: " + self.coach + " -> " + other.coach)
