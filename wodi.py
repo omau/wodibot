@@ -133,7 +133,9 @@ def run_tasks(browser):
         for entry in class_list:
             if entry.appointment_state == AppointmentState.RESERVED:
                 app_str += entry.get_basic_description()
-
+                app_str += "\n---------------------\n"
+    # print("app_str = ")
+    # print(app_str)
     if SEND_XMPP:
         xmpp.send(app_str)
     browser.save_screenshot('screenie.png')

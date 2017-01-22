@@ -45,7 +45,7 @@ class Calendar():
     def parse_cal_row(self, row, date):
         tds = row.find_elements_by_xpath("td")
         assert len(tds) == 9
-        name = tds[0].text.encode('utf-8')
+        name = tds[0].text
         classload = tds[1].text
 
         reserv_col = tds[2].get_attribute('innerHTML')
@@ -58,10 +58,10 @@ class Calendar():
         else:
             state = AppointmentState.OTHER
 
-        program = tds[4].text.encode('utf-8')
-        start_time = tds[6].text.encode('utf-8')
-        end_time = tds[7].text.encode('utf-8')
-        coach = tds[8].text.encode('utf-8')
+        program = tds[4].text
+        start_time = tds[6].text
+        end_time = tds[7].text
+        coach = tds[8].text
 
         s = ScheduleEntry(name, classload, state,
                           program, date, start_time, end_time, coach)
@@ -104,5 +104,5 @@ class Calendar():
             for row_index in range(1, len(one_day)):
                 row = one_day[row_index]
                 s = self.parse_cal_row(row, cal_day)
-                classes[cal_day].extend(s)
+                classes[cal_day].extend([s])
         return classes
