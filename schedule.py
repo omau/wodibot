@@ -13,7 +13,7 @@ class ScheduleEntry:
         self.coach = coach
 
     def __str__(self):
-        class_descr = "{} class on {} from {] to {}. ".format(
+        class_descr = "{} class on {} from {} to {}. ".format(
                 self.program,
                 self.date,
                 self.start_time,

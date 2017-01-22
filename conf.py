@@ -12,13 +12,14 @@ USERNAME = None
 PASSWORD = None
 
 BASE_URL = None
-CALENDAR_URL = BASE_URL + "Schedule/CalendarListViewEntry.aspx"
+CALENDAR_URL = None
+CAL_SUFFIX = "Schedule/CalendarListViewEntry.aspx"
 
 
 def read_config(filename):
     global TARGET_JID, BOT_JID, BOT_PASSWORD
     global USERNAME, PASSWORD
-    global BASE_URL
+    global BASE_URL, CALENDAR_URL
     config = configparser.ConfigParser()
     config.read(filename)
     TARGET_JID = config['JABBER']['TARGET_JID']
@@ -28,3 +29,4 @@ def read_config(filename):
     USERNAME = config['APP_PROVIDER']['username']
     PASSWORD = config['APP_PROVIDER']['password']
     BASE_URL = config['APP_PROVIDER']['base_url']
+    CALENDAR_URL = BASE_URL + CAL_SUFFIX

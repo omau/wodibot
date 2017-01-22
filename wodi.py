@@ -17,9 +17,9 @@ import xmpp
 from display import get_virtual_display, stop_virtual_display
 from wodicalendar import Calendar
 from conf import USE_VIRTUAL_DISPLAY
-from conf import WODIFY_USERNAME, WODIFY_PASSWORD
 from conf import SEND_XMPP
 from conf import LOGGER_NAME
+import conf
 
 THEME_PREFIX = "AthleteTheme_wtLayoutNormal_block_"
 WOD_HEADER_ELEMENT_ID = THEME_PREFIX + "wtTitle_wtTitleDiv"
@@ -44,11 +44,12 @@ def wod_finished_loading(browser):
 
 
 def login(browser, wait):
+    from conf import USERNAME, PASSWORD
     browser.get('https://app.wodify.com/WodifyAdminTheme/LoginEntry.aspx')
     uname = browser.find_element_by_id(USERNAME_ID)
-    uname.send_keys(WODIFY_USERNAME)
+    uname.send_keys(USERNAME)
     pword = browser.find_element_by_id(PASSWORD_ID)
-    pword.send_keys(WODIFY_PASSWORD)
+    pword.send_keys(PASSWORD)
     sleep(1)
     print("submit")
     pword.send_keys(Keys.RETURN)
@@ -88,6 +89,8 @@ def main():
 
     log = logging.Logger(LOGGER_NAME)
 
+    conf.read_config("config.txt")
+
     if USE_VIRTUAL_DISPLAY:
         log.info("Enabling virtual display")
         display = get_virtual_display()
@@ -97,7 +100,6 @@ def main():
     wait = ui.WebDriverWait(browser, 10)
 
     log.info("Logging in")
-
     login(browser, wait)
 
     #####################

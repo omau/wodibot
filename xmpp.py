@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 import sleekxmpp
-from conf import BOT_JID, BOT_PASSWORD, JID
+from conf import BOT_JID, BOT_PASSWORD, TARGET_JID
 
 
 def send(xmpp_message):
-    xmpp = SendMsgBot(BOT_JID, BOT_PASSWORD, JID, xmpp_message)
+    xmpp = SendMsgBot(BOT_JID, BOT_PASSWORD, TARGET_JID, xmpp_message)
     xmpp.register_plugin('xep_0030')  # Service Discovery
     xmpp.register_plugin('xep_0199')  # XMPP Ping
 
