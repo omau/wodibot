@@ -1,5 +1,6 @@
 from time import sleep
 from collections import defaultdict
+from dateutil import parser
 
 import conf
 from schedule import ScheduleEntry
@@ -98,7 +99,8 @@ class Calendar():
         for one_day in self.get_by_days(cal_table):
             print(SEP_DASHES + " DAY SEPARATOR " + SEP_DASHES)
             cal_day = one_day[0].find_elements_by_xpath("td")[0].text
-            cal_day = cal_day.encode('utf-8')
+            cal_day = cal_day.split("\n")[1]
+            cal_day = parser.parse(cal_day).date()
 
             print("Day: ", cal_day)
             for row_index in range(1, len(one_day)):
