@@ -46,7 +46,7 @@ class Calendar():
         tds = row.find_elements_by_xpath("td")
         assert len(tds) == 9
         name = tds[0].text
-        classload = tds[1].text
+        classload = tds[1].text.replace("\n", "")
 
         reserv_col = tds[2].get_attribute('innerHTML')
         if "Make Reservation" in reserv_col:

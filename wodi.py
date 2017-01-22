@@ -4,6 +4,7 @@
 import logging
 import re
 import datetime
+import pickle
 
 from time import sleep
 
@@ -90,8 +91,53 @@ def parse_wod(browser):
     wod_date = date
 
     log.info("Finished Parsing WoD.")
-    log.info("Result of parsing: "+wod)
     return wod, wod_date
+
+
+def handle_disappeared(entry, past_schedule):
+    print("Entry " + entry.get_basic_description() +
+          " no longer exists, removing...")
+    past_schedule[entry.date].remove(entry)
+
+
+def handle_existing(entry, current_classes):
+    found = False
+    for current_entry in current_classes[entry.date]:
+        if current_entry == entry:
+            found = True
+            entry.update(current_entry)
+    assert(found)
+
+
+def handle_new(entry, past_schedule):
+    past_schedule[entry.date].extend([entry])
+    print("Found new entry "+entry.get_basic_description())
+
+
+def update_classes_history(current_classes):
+    past_schedule = pickle.load(open("sched.p", "rb"))
+
+    saved_dates = set(past_schedule.keys())
+    current_dates = set(current_classes.keys())
+
+    for date in saved_dates.union(current_dates):
+        past_list = past_schedule[date]
+
+        for entry in past_list:
+            if entry not in current_classes[date]:
+                # found event in history that is not in current_classes
+                # so it is either expired or cancelled
+                handle_disappeared(entry, past_schedule)
+            else:
+                handle_existing(entry, current_classes)
+
+        for entry in current_classes[date]:
+            if entry in past_list:
+                # already treated in above case
+                continue
+            else:
+                handle_new(entry, past_schedule)
+    pickle.dump(past_schedule, open("sched.p", "wb"))
 
 
 def run_tasks(browser):
@@ -138,8 +184,8 @@ def run_tasks(browser):
     # print(app_str)
     if SEND_XMPP:
         xmpp.send(app_str)
-    browser.save_screenshot('screenie.png')
 
+    update_classes_history(classes)
 ##################
 
 
