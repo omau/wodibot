@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import os
 import re
 import datetime
 
@@ -94,22 +93,8 @@ def parse_wod(browser):
     return wod, wod_date
 
 
-##################
-def main():
-    """ Regular entry point """
+def run_tasks(browser):
 
-    prepare_logger()
-    log = logging.getLogger(__name__)
-    conf.read_config("config.txt")
-
-    if USE_VIRTUAL_DISPLAY:
-        try:
-            log.info("Enabling virtual display")
-            display = get_virtual_display()
-        except RuntimeError:
-            stop_virtual_display(display)
-
-    browser = get_browser()
     wait = ui.WebDriverWait(browser, 10)
 
     login(browser, wait)
@@ -137,14 +122,32 @@ def main():
     cal.open_date(today)
 
     cal.parse_table()
-
     browser.save_screenshot('screenie.png')
-    browser.quit()
-    if USE_VIRTUAL_DISPLAY:
-        stop_virtual_display(display)
 
-    os.system("killall firefox")
-    os.system("killall Xvfb")
+##################
+
+
+def main():
+    """ Regular entry point """
+
+    prepare_logger()
+    log = logging.getLogger(__name__)
+    conf.read_config("config.txt")
+
+    if USE_VIRTUAL_DISPLAY:
+        log.info("Enabling virtual display")
+        display = get_virtual_display()
+    else:
+        log.info("Not using virtual display")
+
+    browser = get_browser()
+
+    try:
+        run_tasks(browser)
+    finally:
+        browser.quit()
+        if USE_VIRTUAL_DISPLAY:
+            stop_virtual_display(display)
 
 
 if __name__ == "__main__":
