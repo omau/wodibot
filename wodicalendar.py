@@ -1,8 +1,9 @@
 from time import sleep
+from collections import defaultdict
 
 import conf
 from schedule import ScheduleEntry
-
+from schedule import AppointmentState
 WEEKDAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY",
             "FRIDAY", "SATURDAY", "SUNDAY"]
 THEME_PREFIX = "AthleteTheme_wt5_block_wtMainContent_wt8_"
@@ -46,29 +47,23 @@ class Calendar():
         assert len(tds) == 9
         name = tds[0].text.encode('utf-8')
         classload = tds[1].text
-        can_make_appointment = "UNKNOWN"
 
         reserv_col = tds[2].get_attribute('innerHTML')
         if "Make Reservation" in reserv_col:
-            can_make_appointment = "YES"
+            state = AppointmentState.RESERVABLE
         elif "has expired" in reserv_col:
-            can_make_appointment = "NO"
+            state = AppointmentState.NOT_RESERVABLE
         elif "You have a" in reserv_col:
-            can_make_appointment = "ALREADY RESERVED"
+            state = AppointmentState.RESERVED
         else:
-            can_make_appointment = "NO"
-        cancel_col = tds[3].get_attribute('innerHTML')
-        if "Cancel Reservation" in cancel_col:
-            can_cancel = "YES"
-        else:
-            can_cancel = "NO"
+            state = AppointmentState.OTHER
 
         program = tds[4].text.encode('utf-8')
         start_time = tds[6].text.encode('utf-8')
         end_time = tds[7].text.encode('utf-8')
         coach = tds[8].text.encode('utf-8')
 
-        s = ScheduleEntry(name, classload, can_make_appointment, can_cancel,
+        s = ScheduleEntry(name, classload, state,
                           program, date, start_time, end_time, coach)
         return s
 
@@ -97,6 +92,9 @@ class Calendar():
 
     def parse_table(self):
         cal_table = self.browser.find_elements_by_xpath(TABLE_RECORDS_XPATH)
+
+        classes = defaultdict(list)
+
         for one_day in self.get_by_days(cal_table):
             print(SEP_DASHES + " DAY SEPARATOR " + SEP_DASHES)
             cal_day = one_day[0].find_elements_by_xpath("td")[0].text
@@ -106,4 +104,5 @@ class Calendar():
             for row_index in range(1, len(one_day)):
                 row = one_day[row_index]
                 s = self.parse_cal_row(row, cal_day)
-                print(s)
+                classes[cal_day].extend(s)
+        return classes

@@ -20,6 +20,7 @@ from display import get_virtual_display, stop_virtual_display
 from wodicalendar import Calendar
 from conf import USE_VIRTUAL_DISPLAY
 from conf import SEND_XMPP
+from schedule import AppointmentState
 import conf
 
 THEME_PREFIX = "AthleteTheme_wtLayoutNormal_block_"
@@ -121,7 +122,20 @@ def run_tasks(browser):
     today = datetime.date.today()
     cal.open_date(today)
 
-    cal.parse_table()
+    classes = cal.parse_table()
+
+    # print next appointments
+
+    app_str = "Your next appointments: \n"
+
+    for date in classes:
+        class_list = classes[date]
+        for entry in class_list:
+            if entry.appointment_state == AppointmentState.RESERVED:
+                app_str += entry.get_basic_description()
+
+    if SEND_XMPP:
+        xmpp.send(app_str)
     browser.save_screenshot('screenie.png')
 
 ##################
