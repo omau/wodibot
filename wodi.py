@@ -75,10 +75,11 @@ def parse_wod(browser):
     date = wodheader.text
     wod_elem = browser.find_elements_by_id(WOD_BODY_ELEMENT_ID)[0]
     html = wod_elem.get_attribute('innerHTML')
+    print("wod_html=", html)
 
     wod = html.replace("<div class=\"section_title\">", "<br>")
     wod = wod.replace("<div class=\"component_show_wrapper\">", "<br>")
-    wod = wod.replace("<div class=\"component_comment\">", "")
+    wod = wod.replace("<div class=\"component_comment\">", "\n")
     wod = re.sub("[<]\/?div.*?[>]", "<br>", wod)
     wod = wod.replace("<br><br>", "<br>")
     wod = wod.replace("<br><br><br>", "<br>")
@@ -86,6 +87,7 @@ def parse_wod(browser):
     wod = re.sub("[\<].*?[\>]", "\n", wod)
     wod = wod.replace("&nbsp;", "")
     wod = re.sub("[\<].*?[\>]", "", wod)
+    wod = wod.replace("\n\n\n", "\n\n")
     date = " ".join(date.split()[0:4])
 
     wod_date = date
