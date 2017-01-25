@@ -7,6 +7,8 @@ import datetime
 import pickle
 
 from time import sleep
+from datetime import timedelta
+from collections import defaultdict
 
 from selenium import webdriver
 from selenium.webdriver.support import ui
@@ -116,13 +118,26 @@ def handle_new(entry, past_schedule):
     print("Found new entry "+entry.get_basic_description())
 
 
+def remove_old_classes(past_schedule):
+    today = datetime.date.today()
+    dates_to_remove = []
+
+    for class_date in past_schedule.keys():
+        if class_date < today:
+            dates_to_remove += [class_date]
+    for class_date in dates_to_remove:
+        del past_schedule[class_date]
+
+    return past_schedule
+
+
 def update_classes_history(current_classes):
     past_schedule = pickle.load(open("sched.p", "rb"))
-
-    saved_dates = set(past_schedule.keys())
+    assert past_schedule is not None
+    assert type(past_schedule) == defaultdict
     current_dates = set(current_classes.keys())
 
-    for date in saved_dates.union(current_dates):
+    for date in current_dates:
         past_list = past_schedule[date]
 
         for entry in past_list:
@@ -139,7 +154,10 @@ def update_classes_history(current_classes):
                 continue
             else:
                 handle_new(entry, past_schedule)
+
+    past_schedule = remove_old_classes(past_schedule)
     pickle.dump(past_schedule, open("sched.p", "wb"))
+    return past_schedule
 
 
 def run_tasks(browser):
@@ -167,17 +185,30 @@ def run_tasks(browser):
     cal = Calendar(browser, wait)
     cal.open_calendar()
 
+    #####################
+    # read next 7 days of classes
+    #####################
     today = datetime.date.today()
     cal.open_date(today)
 
     classes = cal.parse_table()
+    update_classes_history(classes)
+
+    #####################
+    # read next 7 days of classes
+    #####################
+    next_week = today + timedelta(weeks=1)
+    cal.open_date(next_week)
+
+    classes = cal.parse_table()
+    schedule = update_classes_history(classes)
 
     # print next appointments
 
     app_str = "Your next appointments: \n"
 
-    for date in classes:
-        class_list = classes[date]
+    for date in schedule:
+        class_list = schedule[date]
         for entry in class_list:
             if entry.appointment_state == AppointmentState.RESERVED:
                 app_str += entry.get_basic_description()
@@ -187,7 +218,6 @@ def run_tasks(browser):
     if SEND_XMPP:
         xmpp.send(app_str)
 
-    update_classes_history(classes)
 ##################
 
 
