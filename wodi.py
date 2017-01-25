@@ -7,6 +7,7 @@ import datetime
 import pickle
 
 from time import sleep
+from datetime import timedelta
 
 from selenium import webdriver
 from selenium.webdriver.support import ui
@@ -167,10 +168,23 @@ def run_tasks(browser):
     cal = Calendar(browser, wait)
     cal.open_calendar()
 
+    #####################
+    # read next 7 days of classes
+    #####################
     today = datetime.date.today()
     cal.open_date(today)
 
     classes = cal.parse_table()
+    update_classes_history(classes)
+
+    #####################
+    # read next 7 days of classes
+    #####################
+    next_week = today + timedelta(weeks=1)
+    cal.open_date(next_week)
+
+    classes = cal.parse_table()
+    update_classes_history(classes)
 
     # print next appointments
 
@@ -187,7 +201,6 @@ def run_tasks(browser):
     if SEND_XMPP:
         xmpp.send(app_str)
 
-    update_classes_history(classes)
 ##################
 
 
