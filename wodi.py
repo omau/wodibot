@@ -120,10 +120,10 @@ def handle_new(entry, past_schedule):
 def update_classes_history(current_classes):
     past_schedule = pickle.load(open("sched.p", "rb"))
 
-    saved_dates = set(past_schedule.keys())
+    # saved_dates = set(past_schedule.keys())
     current_dates = set(current_classes.keys())
 
-    for date in saved_dates.union(current_dates):
+    for date in current_dates:
         past_list = past_schedule[date]
 
         for entry in past_list:
