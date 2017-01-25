@@ -1,6 +1,7 @@
 """ This module defines a class which represents calendar entries."""
 
 from enum import Enum
+import calendar
 
 
 class AppointmentState(Enum):
@@ -20,6 +21,7 @@ class ScheduleEntry:
         self.appointment_state = appointment_state
         self.program = program
         self.date = date
+        self.weekday = calendar.day_name[date.weekday()]
         self.start_time = start_time
         self.end_time = end_time
         self.coach = coach
@@ -36,8 +38,9 @@ class ScheduleEntry:
         return class_descr + properties
 
     def get_basic_description(self):
-        class_descr = "{} class on {} from {} to {}. ".format(
+        class_descr = "{} class on {}, {} from {} to {}. ".format(
             self.program,
+            self.weekday,
             self.date,
             self.start_time,
             self.end_time
