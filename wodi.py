@@ -157,6 +157,7 @@ def update_classes_history(current_classes):
 
     past_schedule = remove_old_classes(past_schedule)
     pickle.dump(past_schedule, open("sched.p", "wb"))
+    return past_schedule
 
 
 def run_tasks(browser):
@@ -200,14 +201,14 @@ def run_tasks(browser):
     cal.open_date(next_week)
 
     classes = cal.parse_table()
-    update_classes_history(classes)
+    schedule = update_classes_history(classes)
 
     # print next appointments
 
     app_str = "Your next appointments: \n"
 
-    for date in classes:
-        class_list = classes[date]
+    for date in schedule:
+        class_list = schedule[date]
         for entry in class_list:
             if entry.appointment_state == AppointmentState.RESERVED:
                 app_str += entry.get_basic_description()
