@@ -8,6 +8,7 @@ import pickle
 
 from time import sleep
 from datetime import timedelta
+from collections import defaultdict
 
 from selenium import webdriver
 from selenium.webdriver.support import ui
@@ -119,14 +120,21 @@ def handle_new(entry, past_schedule):
 
 def remove_old_classes(past_schedule):
     today = datetime.date.today()
-    for date in past_schedule.keys():
-        if date < today:
-            del past_schedule[date]
+    dates_to_remove = []
+
+    for class_date in past_schedule.keys():
+        if class_date < today:
+            dates_to_remove += [class_date]
+    for class_date in dates_to_remove:
+        del past_schedule[class_date]
+
+    return past_schedule
 
 
 def update_classes_history(current_classes):
     past_schedule = pickle.load(open("sched.p", "rb"))
-
+    assert past_schedule is not None
+    assert type(past_schedule) == defaultdict
     current_dates = set(current_classes.keys())
 
     for date in current_dates:
