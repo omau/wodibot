@@ -117,10 +117,16 @@ def handle_new(entry, past_schedule):
     print("Found new entry "+entry.get_basic_description())
 
 
+def remove_old_classes(past_schedule):
+    today = datetime.date.today()
+    for date in past_schedule.keys():
+        if date < today:
+            del past_schedule[date]
+
+
 def update_classes_history(current_classes):
     past_schedule = pickle.load(open("sched.p", "rb"))
 
-    # saved_dates = set(past_schedule.keys())
     current_dates = set(current_classes.keys())
 
     for date in current_dates:
@@ -140,6 +146,8 @@ def update_classes_history(current_classes):
                 continue
             else:
                 handle_new(entry, past_schedule)
+
+    past_schedule = remove_old_classes(past_schedule)
     pickle.dump(past_schedule, open("sched.p", "wb"))
 
 
