@@ -1,6 +1,6 @@
 from time import sleep
 from collections import defaultdict
-from dateutil import parser
+from datetime import datetime
 
 import conf
 from schedule import ScheduleEntry
@@ -100,7 +100,7 @@ class Calendar():
             print(SEP_DASHES + " DAY SEPARATOR " + SEP_DASHES)
             cal_day = one_day[0].find_elements_by_xpath("td")[0].text
             cal_day = cal_day.split("\n")[1]
-            cal_day = parser.parse(cal_day).date()
+            cal_day = datetime.strptime(cal_day, "%d/%m/%Y").date()
 
             print("Day: ", cal_day)
             for row_index in range(1, len(one_day)):
