@@ -7,8 +7,9 @@ import calendar
 class AppointmentState(Enum):
     RESERVABLE = 1
     RESERVED = 2
-    NOT_RESERVABLE = 3
+    EXPIRED = 3
     FULL = 4
+    FUTURE = 5
 
 
 class ScheduleEntry:
