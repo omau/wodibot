@@ -52,10 +52,12 @@ class Calendar():
         reserv_col = tds[2].get_attribute('innerHTML')
         if "Make Reservation" in reserv_col:
             state = AppointmentState.RESERVABLE
-        elif "has expired" in reserv_col:
-            state = AppointmentState.NOT_RESERVABLE
+        elif "has expired" in reserv_col or "have closed" in reserv_col:
+            state = AppointmentState.EXPIRED
         elif "You have a" in reserv_col:
             state = AppointmentState.RESERVED
+        elif "hours before class" in reserv_col:
+            state = AppointmentState.FUTURE
         else:
             state = AppointmentState.FULL
 
