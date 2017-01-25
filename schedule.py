@@ -57,6 +57,7 @@ class ScheduleEntry:
         return not self == other
 
     def update(self, other):
+        reserve = False
         assert self == other
         if (self.__str__() != other.__str__()):
             print("Found update for "+self.get_basic_description())
@@ -65,6 +66,9 @@ class ScheduleEntry:
                   AppointmentState(self.appointment_state).name +
                   " -> " +
                   AppointmentState(other.appointment_state).name)
+            if self.appointment_state == AppointmentState.FUTURE:
+                if other.appointment_state == AppointmentState.RESERVABLE:
+                    reserve = True
             self.appointment_state = other.appointment_state
         if self.classload != other.classload:
             print("Classload: " + self.classload + " -> " + other.classload)
@@ -72,3 +76,4 @@ class ScheduleEntry:
         if self.coach != other.coach:
             print("Coach: " + self.coach + " -> " + other.coach)
             self.coach = other.coach
+        return reserve
