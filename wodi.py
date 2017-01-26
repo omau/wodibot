@@ -104,18 +104,22 @@ def handle_disappeared(entry, past_schedule):
     past_schedule[entry.date].remove(entry)
 
 
-def handle_existing(entry, current_classes):
+def handle_existing(entry, current_classes, potential_appointments):
     found = False
     for current_entry in current_classes[entry.date]:
         if current_entry == entry:
             found = True
-            entry.update(current_entry)
+            reserve = entry.update(current_entry)
+            if reserve:
+                potential_appointments += [entry]
     assert(found)
 
 
-def handle_new(entry, past_schedule):
+def handle_new(entry, past_schedule, potential_appointments):
     past_schedule[entry.date].extend([entry])
     print("Found new entry "+entry.get_basic_description())
+    if entry.appointment_state == AppointmentState.RESERVABLE:
+        potential_appointments += [entry]
 
 
 def remove_old_classes(past_schedule):
@@ -131,7 +135,7 @@ def remove_old_classes(past_schedule):
     return past_schedule
 
 
-def update_classes_history(current_classes):
+def update_classes_history(current_classes, potential_appointments):
     past_schedule = pickle.load(open("sched.p", "rb"))
     assert past_schedule is not None
     assert type(past_schedule) == defaultdict
@@ -146,18 +150,23 @@ def update_classes_history(current_classes):
                 # so it is either expired or cancelled
                 handle_disappeared(entry, past_schedule)
             else:
-                handle_existing(entry, current_classes)
+                handle_existing(entry, current_classes, potential_appointments)
 
         for entry in current_classes[date]:
             if entry in past_list:
                 # already treated in above case
                 continue
             else:
-                handle_new(entry, past_schedule)
+                handle_new(entry, past_schedule, potential_appointments)
 
     past_schedule = remove_old_classes(past_schedule)
     pickle.dump(past_schedule, open("sched.p", "wb"))
     return past_schedule
+
+
+def make_appointments(browser, potential_appointments):
+    for app in potential_appointments:
+        print("Found new possible appointment:", app.get_basic_description())
 
 
 def run_tasks(browser):
@@ -191,9 +200,12 @@ def run_tasks(browser):
     today = datetime.date.today()
     cal.open_date(today)
 
-    classes = cal.parse_table()
-    update_classes_history(classes)
+    potential_appointments = []
 
+    classes = cal.parse_table()
+
+    update_classes_history(classes, potential_appointments)
+    make_appointments(browser, potential_appointments)
     #####################
     # read next 7 days of classes
     #####################
@@ -201,7 +213,8 @@ def run_tasks(browser):
     cal.open_date(next_week)
 
     classes = cal.parse_table()
-    schedule = update_classes_history(classes)
+    schedule = update_classes_history(classes, potential_appointments)
+    make_appointments(browser, potential_appointments)
 
     # print next appointments
 
