@@ -16,7 +16,7 @@ class ScheduleEntry:
     """ This class represents a single calendar entry."""
 
     def __init__(self, name, classload, appointment_state,
-                 program, date, start_time, end_time, coach):
+                 program, date, start_time, end_time, coach, reserve_button_id):
         self.name = name
         self.classload = classload
         self.appointment_state = appointment_state
@@ -26,6 +26,7 @@ class ScheduleEntry:
         self.start_time = start_time
         self.end_time = end_time
         self.coach = coach
+        self.reserve_button_id = reserve_button_id
 
     def __str__(self):
         class_descr = self.get_basic_description()
@@ -77,3 +78,6 @@ class ScheduleEntry:
             print("Coach: " + self.coach + " -> " + other.coach)
             self.coach = other.coach
         return reserve
+
+    def make_appointment(self, browser):
+        browser.execute_script("document.getElementById('').click()".format(self.reserve_button_id))
