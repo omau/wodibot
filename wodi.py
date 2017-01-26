@@ -167,6 +167,12 @@ def update_classes_history(current_classes, potential_appointments):
 def make_appointments(browser, potential_appointments):
     for app in potential_appointments:
         print("Found new possible appointment:", app.get_basic_description())
+        if app.name.strip() == "08:00 SMCM":
+            app.make_appointment(browser)
+            if SEND_XMPP:
+                xmpp_message = "Created appointment for 08:00 SMCM"
+                xmpp.send(xmpp_message)
+    potential_appointments.clear()
 
 
 def run_tasks(browser):
@@ -205,7 +211,7 @@ def run_tasks(browser):
     classes = cal.parse_table()
 
     update_classes_history(classes, potential_appointments)
-    make_appointments(browser, potential_appointments)
+    make_appointments(browser, potential_appointments, xmpp)
     #####################
     # read next 7 days of classes
     #####################
