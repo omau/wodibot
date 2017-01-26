@@ -48,10 +48,13 @@ class Calendar():
         assert len(tds) == 9
         name = tds[0].text
         classload = tds[1].text.replace("\n", "")
-
         reserv_col = tds[2].get_attribute('innerHTML')
+
         if "Make Reservation" in reserv_col:
             state = AppointmentState.RESERVABLE
+            left_index = reserv_col.find("id")+4
+            right_index = reserv_col.find("tabindex")-2
+            reserve_button_id = reserv_col[left_index:right_index]
         elif "has expired" in reserv_col or "have closed" in reserv_col:
             state = AppointmentState.EXPIRED
         elif "You have a" in reserv_col:
@@ -67,7 +70,7 @@ class Calendar():
         coach = tds[8].text
 
         s = ScheduleEntry(name, classload, state,
-                          program, date, start_time, end_time, coach)
+                          program, date, start_time, end_time, coach, reserve_button_id)
         return s
 
     def is_day_descriptor(self, row):
