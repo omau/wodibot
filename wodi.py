@@ -164,7 +164,7 @@ def update_classes_history(current_classes, potential_appointments):
     return past_schedule
 
 
-def make_appointments(browser, potential_appointments):
+def make_appointments(browser, potential_appointments, xmpp):
     for app in potential_appointments:
         print("Found new possible appointment:", app.get_basic_description())
         if app.name.strip() == "08:00 SMCM":

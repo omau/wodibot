@@ -1,7 +1,7 @@
 import configparser
 
 USE_VIRTUAL_DISPLAY = False
-SEND_XMPP = True
+SEND_XMPP = False
 
 TARGET_JID = None
 BOT_JID = None
