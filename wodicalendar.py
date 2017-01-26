@@ -49,7 +49,7 @@ class Calendar():
         name = tds[0].text
         classload = tds[1].text.replace("\n", "")
         reserv_col = tds[2].get_attribute('innerHTML')
-
+        reserve_button_id = None
         if "Make Reservation" in reserv_col:
             state = AppointmentState.RESERVABLE
             left_index = reserv_col.find("id")+4
