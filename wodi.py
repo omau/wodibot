@@ -170,7 +170,7 @@ def make_appointments(browser, potential_appointments, xmpp):
         if app.name.strip() == "08:00 SMCM":
             app.make_appointment(browser)
             if SEND_XMPP:
-                xmpp_message = "Created appointment for 08:00 SMCM"
+                xmpp_message = "Created appointment for {}".format(app.get_basic_description())
                 xmpp.send(xmpp_message)
     potential_appointments.clear()
 
