@@ -111,7 +111,7 @@ def handle_existing(entry, current_classes, potential_appointments):
             found = True
             reserve = entry.update(current_entry)
             if reserve:
-                potential_appointments += [entry]
+                potential_appointments += [current_entry]
     assert(found)
 
 
