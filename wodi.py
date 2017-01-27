@@ -220,7 +220,7 @@ def run_tasks(browser):
 
     classes = cal.parse_table()
     schedule = update_classes_history(classes, potential_appointments)
-    make_appointments(browser, potential_appointments)
+    make_appointments(browser, potential_appointments, xmpp)
 
     # print next appointments
 
