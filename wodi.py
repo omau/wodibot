@@ -164,10 +164,22 @@ def update_classes_history(current_classes, potential_appointments):
     return past_schedule
 
 
+def is_in_appointment_list(app):
+    if app.name.strip() == "08:00 SMCM" and app.weekday in ["Monday", "Friday"]:
+        return True
+    if app.name.strip() == "09:00 WOD" and app.weekday == "Saturday":
+        return True
+    if app.name.strip() == "08:00 Weightlifting" and app.weekday == "Wednesday":
+        return True
+    if app.name.strip() == "18:00 WOD" and app.weekday == "Wednesday":
+        return True
+    return False
+
+
 def make_appointments(browser, potential_appointments, xmpp):
     for app in potential_appointments:
         print("Found new possible appointment:", app.get_basic_description())
-        if app.name.strip() == "08:00 SMCM":
+        if is_in_appointment_list(app):
             app.make_appointment(browser)
             if SEND_XMPP:
                 xmpp_message = "Created appointment for {}".format(app.get_basic_description())
