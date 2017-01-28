@@ -30,11 +30,15 @@ THEME_PREFIX = "AthleteTheme_wtLayoutNormal_block_"
 WOD_HEADER_ELEMENT_ID = THEME_PREFIX + "wtTitle_wtTitleDiv"
 WOD_BODY_ELEMENT_ID = THEME_PREFIX + "wtMainContent_wtComponentName"
 
-LOGIN_PREFIX = "wtLayoutLogin_SilkUIFramework_wt11_block_"
+USERNAME_ID = "wtUserNameInput"
+PASSWORD_ID = "wtPasswordInput"
 
-USERNAME_ID = LOGIN_PREFIX + "wtUsername_wtUsername_wtUserNameInput"
-PASSWORD_ID = LOGIN_PREFIX + "wtPassword_wtPassword_wtPasswordInput"
+ID_ENDS_WITH = "[id$='{}']"
 
+USERNAME_SELECTOR = ID_ENDS_WITH.format(USERNAME_ID) 
+PASSWORD_SELECTOR = ID_ENDS_WITH.format(PASSWORD_ID)
+
+LOGIN_URL = "https://app.wodify.com/WodifyAdminTheme/LoginEntry.aspx"
 # ------------------------ browser
 
 
@@ -54,11 +58,11 @@ def login(browser, wait):
     Enters credential and submits them."""
     log.info("Loading main page")
     from conf import USERNAME, PASSWORD
-    browser.get('https://app.wodify.com/WodifyAdminTheme/LoginEntry.aspx')
+    browser.get(LOGIN_URL)
     log.info("Entering credentials")
-    uname = browser.find_element_by_id(USERNAME_ID)
+    uname = browser.find_element_by_css_selector(USERNAME_SELECTOR)
     uname.send_keys(USERNAME)
-    pword = browser.find_element_by_id(PASSWORD_ID)
+    pword = browser.find_element_by_css_selector(PASSWORD_SELECTOR)
     pword.send_keys(PASSWORD)
     sleep(1)
     log.info("Submitting")
@@ -110,6 +114,7 @@ def handle_existing(entry, current_classes, potential_appointments):
         if current_entry == entry:
             found = True
             reserve = entry.update(current_entry)
+            assert (entry.__str__() == current_entry.__str__())
             if reserve:
                 potential_appointments += [current_entry]
     assert(found)
@@ -178,11 +183,12 @@ def is_in_appointment_list(app):
 
 def make_appointments(browser, potential_appointments, xmpp):
     for app in potential_appointments:
-        print("Found new possible appointment:", app.get_basic_description())
+        print("Found new possible appointment:", app.get_basic_description(), app.reserve_button_id)
         if is_in_appointment_list(app):
             app.make_appointment(browser)
+            xmpp_message = "Created appointment for {}".format(app.get_basic_description())
+            print(xmpp_message)
             if SEND_XMPP:
-                xmpp_message = "Created appointment for {}".format(app.get_basic_description())
                 xmpp.send(xmpp_message)
     potential_appointments.clear()
 

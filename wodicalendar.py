@@ -40,7 +40,7 @@ class Calendar():
         script_exec(get_elem + "('{}').onchange();"
                     .format(DATE_PICK_ELEMENT_ID))
 
-        sleep(2)
+        sleep(4)
         self.wait.until(calendar_loaded)
 
     def parse_cal_row(self, row, date):
