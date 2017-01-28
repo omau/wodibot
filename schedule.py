@@ -81,3 +81,4 @@ class ScheduleEntry:
 
     def make_appointment(self, browser):
         browser.execute_script("document.getElementById('').click()".format(self.reserve_button_id))
+        self.appointment_state = AppointmentState.RESERVED
