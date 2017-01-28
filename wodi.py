@@ -183,7 +183,7 @@ def is_in_appointment_list(app):
 
 def make_appointments(browser, potential_appointments, xmpp):
     for app in potential_appointments:
-        print("Found new possible appointment:", app.get_basic_description(), app.reserve_button_id)
+        print("Found new possible appointment:", app.get_basic_description())
         if is_in_appointment_list(app):
             app.make_appointment(browser)
             xmpp_message = "Created appointment for {}".format(app.get_basic_description())
