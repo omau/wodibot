@@ -61,6 +61,8 @@ class Calendar():
             state = AppointmentState.RESERVED
         elif "hours before class" in reserv_col:
             state = AppointmentState.FUTURE
+        elif "CANCELLED" in classload:
+            state = AppointmentState.CANCELLED
         else:
             state = AppointmentState.FULL
 

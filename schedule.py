@@ -10,6 +10,7 @@ class AppointmentState(Enum):
     EXPIRED = 3
     FULL = 4
     FUTURE = 5
+    CANCELLED = 6
 
 
 class ScheduleEntry:

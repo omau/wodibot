@@ -35,7 +35,7 @@ PASSWORD_ID = "wtPasswordInput"
 
 ID_ENDS_WITH = "[id$='{}']"
 
-USERNAME_SELECTOR = ID_ENDS_WITH.format(USERNAME_ID) 
+USERNAME_SELECTOR = ID_ENDS_WITH.format(USERNAME_ID)
 PASSWORD_SELECTOR = ID_ENDS_WITH.format(PASSWORD_ID)
 
 LOGIN_URL = "https://app.wodify.com/WodifyAdminTheme/LoginEntry.aspx"
