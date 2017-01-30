@@ -23,6 +23,7 @@ from display import get_virtual_display, stop_virtual_display
 from wodicalendar import Calendar
 from conf import USE_VIRTUAL_DISPLAY
 from conf import SEND_XMPP
+from conf import SEND_APPOINTMENTS
 from schedule import AppointmentState
 import conf
 
@@ -240,22 +241,22 @@ def run_tasks(browser):
     schedule = update_classes_history(classes, potential_appointments)
     make_appointments(browser, potential_appointments, xmpp)
 
-    # print next appointments
+    if SEND_APPOINTMENTS:
+        send_next_appointments(schedule)
 
+##################
+
+
+def send_next_appointments(schedule):
     app_str = "Your next appointments: \n"
-
     for date in schedule:
         class_list = schedule[date]
         for entry in class_list:
             if entry.appointment_state == AppointmentState.RESERVED:
                 app_str += entry.get_basic_description()
                 app_str += "\n---------------------\n"
-    # print("app_str = ")
-    # print(app_str)
     if SEND_XMPP:
         xmpp.send(app_str)
-
-##################
 
 
 def main():
