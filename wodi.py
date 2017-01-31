@@ -206,13 +206,19 @@ def run_tasks(browser):
 
     wod, wod_date = parse_wod(browser)
 
+    last_wod = pickle.load(open("lastwod.p", "rb"))
+    if last_wod == (wod_date+wod):
+        same_wod = True
+    else:
+        same_wod = False
     #####################
     # send today's wod via xmpp
     #####################
-    if SEND_XMPP:
+    if SEND_XMPP and not same_wod:
         xmpp_message = wod_date + "\n" + wod
         xmpp.send(xmpp_message)
 
+    pickle.dump(wod_date+wod, open("lastwod.p", "wb"))
     #####################
     # browse to calendar
     #####################
