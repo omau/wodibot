@@ -27,6 +27,7 @@ from wodicalendar import Calendar
 from conf import USE_VIRTUAL_DISPLAY
 from conf import SEND_XMPP
 from conf import SEND_APPOINTMENTS
+from conf import MAKE_APPOINTMENTS
 from schedule import AppointmentState
 import conf
 
@@ -260,7 +261,8 @@ def run_tasks(browser):
 
     classes = cal.parse_table()
     schedule = update_classes_history(classes, potential_appointments)
-    make_appointments(browser, potential_appointments, xmpp)
+    if MAKE_APPOINTMENTS:
+        make_appointments(browser, potential_appointments, xmpp)
 
     if SEND_APPOINTMENTS:
         send_next_appointments(schedule)
