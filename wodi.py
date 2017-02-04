@@ -89,7 +89,7 @@ def parse_wod_page(html_source):
     wod_elem = source.cssselect(WOD_ELEM_SELECTOR)[0]
 
     date = wodheader.text_content()
-    date = " ".join(date.split()[0:4])
+    date = " ".join(date.split()[0:4]).strip()
 
     wod_html = html.tostring(wod_elem).decode('utf-8')
     return parse_wod_html(wod_html), date
@@ -103,14 +103,17 @@ def parse_wod_html(wod_html):
 
     wod = wod_html.replace("<div class=\"section_title\">", "<br>")
     wod = wod.replace("<div class=\"component_show_wrapper\">", "<br>")
-    wod = wod.replace("<div class=\"component_comment\">", "\n")
+    wod = wod.replace("<div class=\"component_comment\">", "\n\n")
+    wod = wod.replace("</div></div></div>", "\n\n")
     wod = re.sub("[<]\/?div.*?[>]", "<br>", wod)
+    wod = wod.replace("Metcon&#160;", "")
     wod = wod.replace("<br><br>", "<br>")
     wod = wod.replace("<br><br><br>", "<br>")
     wod = re.sub("[\<]br?[\>]", "\n", wod)
     wod = re.sub("[\<].*?[\>]", "\n", wod)
     wod = wod.replace("&nbsp;", "")
     wod = re.sub("[\<].*?[\>]", "", wod)
+    wod = wod.replace("\n\n\n", "\n\n")
     wod = wod.replace("\n\n\n", "\n\n")
 
     log.info("Finished Parsing WoD.")
