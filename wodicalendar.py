@@ -2,6 +2,9 @@ from time import sleep
 from collections import defaultdict
 from datetime import datetime
 
+import lxml
+from lxml import etree
+
 import conf
 from schedule import ScheduleEntry
 from schedule import AppointmentState
@@ -44,11 +47,21 @@ class Calendar():
         self.wait.until(calendar_loaded)
 
     def parse_cal_row(self, row, date):
-        tds = row.find_elements_by_xpath("td")
-        assert len(tds) == 9
-        name = tds[0].text
-        classload = tds[1].text.replace("\n", "")
-        reserv_col = tds[2].get_attribute('innerHTML')
+        assert len(row) == 9
+        name = row[0][0][0].text
+
+        if (len(list(row[1][0].itertext())) == 1):
+            classload = list(row[1][0].itertext())[0]
+        elif len(list(row[1][0].itertext())) == 5:
+            reserved = list(row[1][0].itertext())[0]
+            waitlisted = "(" + list(row[1][0].itertext())[4].strip() + ")"
+            classload = reserved + " " + waitlisted
+        elif len(list(row[1][0].itertext())) in [3, 4]:
+            classload = list(row[1][0].itertext())[0]
+
+        assert len(list(row[1][0].itertext())) in [1, 3, 4, 5]
+
+        reserv_col = etree.tostring(row[2]).decode('utf-8')
         reserve_button_id = None
         if "Make Reservation" in reserv_col:
             state = AppointmentState.RESERVABLE
@@ -66,22 +79,20 @@ class Calendar():
         else:
             state = AppointmentState.FULL
 
-        program = tds[4].text
-        start_time = tds[6].text
-        end_time = tds[7].text
-        coach = tds[8].text
+        program = row[4][0].text
+        start_time = row[6][0][0].text
+        end_time = row[7][0][0].text
+        if len(row[8][0].getchildren()) != 0:
+            coach = row[8][0][0].text
+        else:
+            coach = ""
 
         s = ScheduleEntry(name, classload, state,
                           program, date, start_time, end_time, coach, reserve_button_id)
         return s
 
-    def is_day_descriptor(self, row):
-        is_day = False
-        first_col = row.find_elements_by_xpath("td")[0].text
-        for day in WEEKDAYS:
-            if day in first_col:
-                is_day = True
-        return is_day
+    def is_day_descriptor(self, tr):
+        return tr[0][0].tag == 'span'
 
     def get_by_days(self, cal_table):
         by_days = []
@@ -99,14 +110,15 @@ class Calendar():
         return by_days
 
     def parse_table(self):
-        cal_table = self.browser.find_elements_by_xpath(TABLE_RECORDS_XPATH)
+        root = lxml.html.fromstring(self.browser.page_source)
+        cal_table = root.cssselect("[id$='wtClassTable']")[0]
+        cal_body = cal_table[1]
 
         classes = defaultdict(list)
 
-        for one_day in self.get_by_days(cal_table):
+        for one_day in self.get_by_days(cal_body):
             print(SEP_DASHES + " DAY SEPARATOR " + SEP_DASHES)
-            cal_day = one_day[0].find_elements_by_xpath("td")[0].text
-            cal_day = cal_day.split("\n")[1]
+            cal_day = list(one_day[0][0][0].itertext())[1]
             cal_day = datetime.strptime(cal_day, "%d/%m/%Y").date()
 
             print("Day: ", cal_day)

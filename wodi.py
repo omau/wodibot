@@ -14,6 +14,9 @@ from selenium import webdriver
 from selenium.webdriver.support import ui
 from selenium.webdriver.common.keys import Keys
 
+import lxml
+from lxml import html
+
 # local imports
 
 import xmpp
@@ -24,6 +27,7 @@ from wodicalendar import Calendar
 from conf import USE_VIRTUAL_DISPLAY
 from conf import SEND_XMPP
 from conf import SEND_APPOINTMENTS
+from conf import MAKE_APPOINTMENTS
 from schedule import AppointmentState
 import conf
 
@@ -34,10 +38,15 @@ WOD_BODY_ELEMENT_ID = THEME_PREFIX + "wtMainContent_wtComponentName"
 USERNAME_ID = "wtUserNameInput"
 PASSWORD_ID = "wtPasswordInput"
 
+WOD_TITLE_ID = "wtTitleDiv"
+WOD_ELEM_ID = "wtComponentName"
+
 ID_ENDS_WITH = "[id$='{}']"
 
 USERNAME_SELECTOR = ID_ENDS_WITH.format(USERNAME_ID)
 PASSWORD_SELECTOR = ID_ENDS_WITH.format(PASSWORD_ID)
+WOD_TITLE_SELECTOR = ID_ENDS_WITH.format(WOD_TITLE_ID)
+WOD_ELEM_SELECTOR = ID_ENDS_WITH.format(WOD_ELEM_ID)
 
 LOGIN_URL = "https://app.wodify.com/WodifyAdminTheme/LoginEntry.aspx"
 # ------------------------ browser
@@ -73,21 +82,31 @@ def login(browser, wait):
 # -------------------------- WOD
 
 
-def parse_wod(browser):
+def parse_wod_page(html_source):
+    source = lxml.html.fromstring(html_source)
+
+    wodheader = source.cssselect(WOD_TITLE_SELECTOR)[0]
+    wod_elem = source.cssselect(WOD_ELEM_SELECTOR)[0]
+
+    date = wodheader.text_content()
+    date = " ".join(date.split()[0:4]).strip()
+
+    wod_html = html.tostring(wod_elem).decode('utf-8')
+    return parse_wod_html(wod_html), date
+
+
+def parse_wod_html(wod_html):
     log = logging.getLogger(__name__)
     log.info("Parsing WoD...")
     """ Assumes wod page is open.
     Parses wod, converts it to a text-based representation and returns it."""
-    wodheader = browser.find_elements_by_id(WOD_HEADER_ELEMENT_ID)[0]
-    date = wodheader.text
-    wod_elem = browser.find_elements_by_id(WOD_BODY_ELEMENT_ID)[0]
-    html = wod_elem.get_attribute('innerHTML')
-    print("wod_html=", html)
 
-    wod = html.replace("<div class=\"section_title\">", "<br>")
+    wod = wod_html.replace("<div class=\"section_title\">", "<br>")
     wod = wod.replace("<div class=\"component_show_wrapper\">", "<br>")
-    wod = wod.replace("<div class=\"component_comment\">", "\n")
+    wod = wod.replace("<div class=\"component_comment\">", "\n\n")
+    wod = wod.replace("</div></div></div>", "\n\n")
     wod = re.sub("[<]\/?div.*?[>]", "<br>", wod)
+    wod = wod.replace("Metcon&#160;", "")
     wod = wod.replace("<br><br>", "<br>")
     wod = wod.replace("<br><br><br>", "<br>")
     wod = re.sub("[\<]br?[\>]", "\n", wod)
@@ -95,12 +114,12 @@ def parse_wod(browser):
     wod = wod.replace("&nbsp;", "")
     wod = re.sub("[\<].*?[\>]", "", wod)
     wod = wod.replace("\n\n\n", "\n\n")
-    date = " ".join(date.split()[0:4])
-
-    wod_date = date
+    wod = wod.replace("\n\n\n", "\n\n")
 
     log.info("Finished Parsing WoD.")
-    return wod, wod_date
+    print("WOD:")
+    print(wod)
+    return wod
 
 
 def handle_disappeared(entry, past_schedule):
@@ -203,8 +222,8 @@ def run_tasks(browser):
     #####################
     # parse today's wod
     #####################
-
-    wod, wod_date = parse_wod(browser)
+    wod_page_source = browser.page_source
+    wod, wod_date = parse_wod_page(wod_page_source)
 
     last_wod = pickle.load(open("lastwod.p", "rb"))
     if last_wod == (wod_date+wod):
@@ -245,7 +264,8 @@ def run_tasks(browser):
 
     classes = cal.parse_table()
     schedule = update_classes_history(classes, potential_appointments)
-    make_appointments(browser, potential_appointments, xmpp)
+    if MAKE_APPOINTMENTS:
+        make_appointments(browser, potential_appointments, xmpp)
 
     if SEND_APPOINTMENTS:
         send_next_appointments(schedule)

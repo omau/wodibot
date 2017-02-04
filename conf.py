@@ -1,8 +1,10 @@
 import configparser
 
 USE_VIRTUAL_DISPLAY = False
-SEND_XMPP = False
+SEND_XMPP = True
 SEND_APPOINTMENTS = False
+
+MAKE_APPOINTMENTS = False
 
 TARGET_JID = None
 BOT_JID = None
