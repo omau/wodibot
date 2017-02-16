@@ -115,7 +115,7 @@ def parse_wod_html(wod_html):
     wod = re.sub("[\<].*?[\>]", "", wod)
     wod = wod.replace("\n\n\n", "\n\n")
     wod = wod.replace("\n\n\n", "\n\n")
-    wod = wod.replace("#160;", " ")
+    wod = wod.replace("&#160;", " ")
 
     log.info("Finished Parsing WoD.")
     print("WOD:")

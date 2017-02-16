@@ -63,6 +63,7 @@ class Calendar():
 
         reserv_col = etree.tostring(row[2]).decode('utf-8')
         reserve_button_id = None
+
         if "Make Reservation" in reserv_col:
             state = AppointmentState.RESERVABLE
             left_index = reserv_col.find("id")+4
