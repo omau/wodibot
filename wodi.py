@@ -149,7 +149,8 @@ def handle_new(entry, past_schedule, potential_appointments):
     print("Found new entry "+entry.get_basic_description())
     if entry.appointment_state == AppointmentState.RESERVABLE:
         potential_appointments += [entry]
-        entry.appointment_state = AppointmentState.RESERVED  # need to set this here so it will be saved into pickle
+        if is_in_appointment_list(entry):
+            entry.appointment_state = AppointmentState.RESERVED  # need to set this here so it will be saved into pickle
 
 
 def remove_old_classes(past_schedule):
