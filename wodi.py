@@ -116,6 +116,9 @@ def parse_wod_html(wod_html):
     wod = wod.replace("\n\n\n", "\n\n")
     wod = wod.replace("\n\n\n", "\n\n")
     wod = wod.replace("&#160;", " ")
+    wod = wod.replace("&#252;", "ü")
+    wod = wod.replace("&#223;", "ß")
+    wod = wod.replace("&#228;", "ä")
 
     log.info("Finished Parsing WoD.")
     print("WOD:")
