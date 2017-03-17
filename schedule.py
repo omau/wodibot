@@ -71,7 +71,8 @@ class ScheduleEntry:
             if self.appointment_state == AppointmentState.FUTURE:
                 if other.appointment_state == AppointmentState.RESERVABLE:
                     reserve = True
-            self.appointment_state = other.appointment_state
+            if other.appointment_state != AppointmentState.FUTURE:
+                self.appointment_state = other.appointment_state
         if self.classload != other.classload:
             print("Classload: " + self.classload + " -> " + other.classload)
             self.classload = other.classload
